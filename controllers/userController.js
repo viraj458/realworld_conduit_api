@@ -9,9 +9,22 @@ export const getCurrentUser = async(req, res) => {
         const {id} = req.user
         const user = await db('users').where({id}).first()
         // console.log(token);
-        
+
         res.status(200).json({user:{email: user.email, token, username: user.username }})
     } catch (err) {
         res.status(400).json({error: err.message})
+    }
+}
+
+//update user
+export const updateUser = async(req, res) => {
+    try {
+        const {id} = req.user
+
+        const updateUser = await db('users').where({ id }).update({...req.body.user})
+        res.status(200).json(updateUser)
+        
+    } catch (err) {
+        res.status(200).json({error: err.message})
     }
 }
