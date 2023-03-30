@@ -30,9 +30,8 @@ const signup = async(email, password, username) =>{
     const salt = await bcrypt.genSalt(10)
     const hash = await bcrypt.hash(password, salt)
   
-    const [user] = await db('users').insert({ email, password: hash, username })
+    const [user] = await db('users').insert({ email, password:hash, username })
 
-    console.log(user);
     return user
   }
 
@@ -42,7 +41,8 @@ const signup = async(email, password, username) =>{
     try {
         const {email, password, username} = req.body.user
         const user = await signup(email, password, username)
-        console.log(user);
+        // console.log(user);
+
         // create a token
         const token = createToken(user)
         res.status(200).json({user:{email, token, username}})
@@ -68,6 +68,9 @@ const login = async(email, password) => {
       if (!match) {
         throw Error('Incorrect password')
       }
+    // if(!password===user.password){
+    //     throw Error('Incorrect password')
+    // }
 
       return user
 }
@@ -81,10 +84,16 @@ export const loginUser = async (req, res) => {
         const {email, password} = req.body.user
         const user = await login(email, password) 
 
+// console.log(user);
+// console.log('====================================');
+// console.log(password);
+// console.log('====================================');
+// console.log(user.password);
+
         // create a token
         const token = createToken(user.id)
   
-        res.status(200).json({user:{email, token}})
+        res.status(200).json({user:{email, token, username: user.username}})
     } catch (error) {
       res.status(400).json({error: error.message})
     }
