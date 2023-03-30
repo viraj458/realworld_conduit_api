@@ -2,6 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import db from './db.js'
 
+import authRoute from './routes/authRoute.js'
 import userRoute from './routes/userRoute.js'
 
 dotenv.config()
@@ -27,4 +28,5 @@ app.get('/', (req, res) => {
 
 
 //routes
-app.use('/users', userRoute)
+app.use('/users', authRoute)
+app.use('/user', userRoute)
