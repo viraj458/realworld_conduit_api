@@ -19,10 +19,20 @@ export const getCurrentUser = async(req, res) => {
 //update user
 export const updateUser = async(req, res) => {
     try {
+        const {authorization} = req.headers
+        const token = authorization.split(' ')[1]
         const {id} = req.user
 
-        const updateUser = await db('users').where({ id }).update({...req.body.user})
-        res.status(200).json(updateUser)
+        await db('users').where({ id }).update({...req.body.user})
+        const [updatedUser] = await db('users').select('*').where({id})
+        // console.log(updatedUser);
+
+        res.status(200).json({
+            user:{
+                email: updatedUser.email, 
+                username: updatedUser.username, 
+                token
+            }})
         
     } catch (err) {
         res.status(200).json({error: err.message})
