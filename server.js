@@ -2,6 +2,8 @@ import express from 'express'
 import dotenv from 'dotenv'
 import db from './db.js'
 
+import userRoute from './routes/userRoute.js'
+
 dotenv.config()
 
 //creating express app
@@ -22,3 +24,7 @@ app.listen(port, () => {
 app.get('/', (req, res) => {
     res.send("welcome to api")
 })
+
+
+//routes
+app.use('/users', userRoute)
