@@ -47,7 +47,7 @@ const signup = async(email, password, username) =>{
 
         // create a token
         const token = createToken(user)
-        res.status(200).json({user:{email, token, username}})
+        res.status(200).json({user:{email, token, username, }})
     } catch (err) {
       res.status(400).json({error: err.message})
     }
@@ -95,7 +95,7 @@ export const loginUser = async (req, res) => {
         // create a token
         const token = createToken(user.id)
   
-        res.status(200).json({user:{email, token, username: user.username}})
+        res.status(200).json({user:{email, token, username: user.username, bio: user.bio, image: user.image}})
     } catch (error) {
       res.status(400).json({error: error.message})
     }
