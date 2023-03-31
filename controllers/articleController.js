@@ -54,10 +54,27 @@ export const createArticle = async(req, res) => {
 }
 
 
-//get all articles
+//get a articles
 
-export const getAllArticles = async(req, res) => {
-    
+export const getArticle = async(req, res) => {
+    try {
+        const { slug } = req.params
+        const [article] = await db('articles').where({slug}).select('*')
+        if (!article) {
+            return res.status(404).json({ error: "article not found" })
+          }
+          console.log(article);
+          res.status(200).json({article:{
+            slug: article.slug,
+            body: article.body,
+            description: article.description,
+            title: article.title,
+            tagList: JSON.parse(article.tagList),
+            author: JSON.parse(article.author)
+        }})
+    } catch (err) {
+        res.status(400).json({error:err.message})
+    }
 }
 
 //delete article
@@ -71,7 +88,7 @@ export const deleteArticle = async(req, res) => {
           }
         
         await db('articles').where({slug}).del()
-        console.log(article);
+        // console.log(article);
         res.status(200).json(article)
     } catch (err) {
         res.status(400).json({error:err.message})
