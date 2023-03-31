@@ -62,5 +62,18 @@ export const getAllArticles = async(req, res) => {
 
 //delete article
 export const deleteArticle = async(req, res) => {
-    
+    try {
+        const { slug } = req.params;
+        
+        const article = await db('articles').where({slug}).select('*')
+        if (!article) {
+            return res.status(404).json({ error: "article not found" })
+          }
+        
+        await db('articles').where('slug', slug).del()
+        console.log(article);
+        res.status(200).json(article)
+    } catch (err) {
+        res.status(400).json({error:err.message})
+    }
 }
