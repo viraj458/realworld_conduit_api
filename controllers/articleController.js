@@ -34,7 +34,7 @@ export const createArticle = async(req, res) => {
         
 
         const [createdArticle] = await db('articles').where('id', article).select('*')
-        // console.log(createdArticle);
+        console.log(createdArticle);
 
         res.status(200).json({article:{
             slug,
@@ -42,6 +42,8 @@ export const createArticle = async(req, res) => {
             description,
             title,
             tagList: JSON.parse(tag_list),
+            createdAt: createdArticle.createdAt,
+            updatedAt: createdArticle.updatedAt,
             author:{
                 username: user.username,
                 bio: user.bio,
