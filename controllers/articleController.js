@@ -60,7 +60,7 @@ export const createArticle = async(req, res) => {
 export const getArticle = async(req, res) => {
     try {
         const { slug } = req.params
-        
+
         const [article] = await db('articles').where({slug}).select('*')
         if (!article) {
             return res.status(404).json({ error: "article not found" })
@@ -117,7 +117,7 @@ export const getAllArticles = async(req, res) => {
               author: JSON.parse(article.author),
             }
           });
-        res.status(200).json({articles:articleList})
+        res.status(200).json({articles:articleList, articlesCount:articleList.length})
     } catch (err) {
         res.status(400).json({error:err.message})
     }
