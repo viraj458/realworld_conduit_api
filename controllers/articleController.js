@@ -23,6 +23,7 @@ export const createArticle = async(req, res) => {
             title,
             tagList: tag_list,
             author:{
+                id:user.id,
                 username: user.username,
                 bio: user.bio,
                 image: user.image,
@@ -33,7 +34,7 @@ export const createArticle = async(req, res) => {
         
 
         const [createdArticle] = await db('articles').where('id', article).select('*')
-        console.log(createdArticle);
+        // console.log(createdArticle);
 
         res.status(200).json({article:{
             slug,
@@ -59,16 +60,15 @@ export const createArticle = async(req, res) => {
 export const getArticle = async(req, res) => {
     try {
         const { slug } = req.params
+        
         const [article] = await db('articles').where({slug}).select('*')
         if (!article) {
             return res.status(404).json({ error: "article not found" })
           }
-          console.log(article);
+        //   console.log(article);
+
           res.status(200).json({article:{
-            slug: article.slug,
-            body: article.body,
-            description: article.description,
-            title: article.title,
+            ...article,
             tagList: JSON.parse(article.tagList),
             author: JSON.parse(article.author)
         }})
@@ -77,20 +77,49 @@ export const getArticle = async(req, res) => {
     }
 }
 
+
 //delete article
 export const deleteArticle = async(req, res) => {
     try {
         const { slug } = req.params;
+        const {id} = req.user
         
         const [article] = await db('articles').where({slug}).select('*')
         if (!article) {
             return res.status(404).json({ error: "article not found" })
           }
+          console.log(article);
+        // const author = JSON.parse(article.author)
+        // const authorId = author.id
+
+        // if(!authorId===id){
+        //     return res.status(401).json({ error: 'You are not authorized to delete this article' })
+        // }
         
-        await db('articles').where({slug}).del()
-        // console.log(article);
+        // console.log(author);
+        await db('articles').where({ slug }).del()
+        
         res.status(200).json(article)
     } catch (err) {
         res.status(400).json({error:err.message})
     }
+}
+
+// get all articles
+export const getAllArticles = async(req, res) => {
+    try {
+        const articles = await db('articles').select('*')
+
+        const articleList = articles.map(article => {
+            return {
+              ...article,
+              tagList: JSON.parse(article.tagList),
+              author: JSON.parse(article.author),
+            }
+          });
+        res.status(200).json({articles:articleList})
+    } catch (err) {
+        res.status(400).json({error:err.message})
+    }
+    
 }
