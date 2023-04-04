@@ -1,6 +1,7 @@
 import express from 'express'
 import { createComment, deleteComment, getAllComments } from '../controllers/commentController.js'
 import auth from '../middlewares/auth.js'
+import authOptional from '../middlewares/authOptional.js'
 
 const router = express.Router()
 
@@ -8,7 +9,7 @@ const router = express.Router()
 router.post('/:slug/comments', auth,  createComment)
 
 //get all comments without auth
-router.get('/:slug/comments',  getAllComments)
+router.get('/:slug/comments',authOptional, getAllComments)
 
 //delete a comment 
 router.delete('/:slug/comments/:commentid', auth,  deleteComment)

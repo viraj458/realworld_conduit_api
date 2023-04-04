@@ -1,6 +1,7 @@
 import express from 'express'
 import { createArticle, deleteArticle, getAllArticles, getArticle, updateArticle } from '../controllers/articleController.js'
 import auth from '../middlewares/auth.js'
+import authOptional from '../middlewares/authOptional.js'
 
 
 const router = express.Router()
@@ -15,7 +16,7 @@ router.get('/:slug', auth, getArticle)
 router.delete('/:slug', auth, deleteArticle)
 
 //get all articles
-router.get('/', getAllArticles)
+router.get('/',authOptional, getAllArticles)
 
 //update a article
 router.put('/:slug', auth, updateArticle)
