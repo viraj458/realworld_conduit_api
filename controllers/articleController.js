@@ -57,16 +57,30 @@ export const getArticle = async(req, res) => {
     try {
         const { slug } = req.params
 
-        const [article] = await db('articles').where({slug}).select('*')
+        const [article] = await db('articles')
+        .where({slug})
+        .join('users', 'articles.author', 'users.id')
+        .select('articles.*', 'users.username', 'users.bio', 'users.image')
+
         if (!article) {
             return res.status(404).json({ error: "article not found" })
           }
-        //   console.log(article);
+          console.log(article);
 
           res.status(200).json({article:{
-            ...article,
+            slug: article.slug,
+            body: article.body,
+            description: article.description,
+            title: article.title,
             tagList: JSON.parse(article.tagList),
-            author: JSON.parse(article.author)
+            createdAt: article.createdAt,
+            updatedAt: article.updatedAt,
+            author:{
+              username: article.username,
+              bio: article.bio,
+              image: article.image,
+              following: false
+            }
         }})
     } catch (err) {
         res.status(400).json({error:err.message})
@@ -80,7 +94,8 @@ export const deleteArticle = async(req, res) => {
         const { slug } = req.params;
         const {id} = req.user
         
-        const [article] = await db('articles').where({slug}).select('*')
+        const [article] = await db('articles').where({slug})
+        
         if (!article) {
             return res.status(404).json({ error: "article not found" })
           }
@@ -124,7 +139,7 @@ export const getAllArticles = async(req, res) => {
                 bio: article.bio,
                 image: article.image,
                 following: false
-            },
+            }
             }
           }));
 
