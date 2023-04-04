@@ -22,13 +22,7 @@ export const createArticle = async(req, res) => {
             description,
             title,
             tagList: tag_list,
-            author:{
-                id:user.id,
-                username: user.username,
-                bio: user.bio,
-                image: user.image,
-                following: false
-            }
+            author: user.id
         })
 
         
@@ -110,15 +104,30 @@ export const deleteArticle = async(req, res) => {
 // get all articles
 export const getAllArticles = async(req, res) => {
     try {
-        const articles = await db('articles').select('*')
 
-        const articleList = articles.map(article => {
+        const articles = await db('articles')
+        .join('users', 'articles.author', 'users.id')
+        .select('articles.*', 'users.username', 'users.bio', 'users.image')
+        
+
+        const articleList = (articles.map( article => {
             return {
-              ...article,
+              slug: article.slug,
+              body: article.body,
+              description: article.description,
+              title: article.title,
               tagList: JSON.parse(article.tagList),
-              author: JSON.parse(article.author),
+              createdAt: article.createdAt,
+              updatedAt: article.updatedAt,
+              author:{
+                username: article.username,
+                bio: article.bio,
+                image: article.image,
+                following: false
+            },
             }
-          });
+          }));
+
         res.status(200).json({articles:articleList, articlesCount:articleList.length})
     } catch (err) {
         res.status(400).json({error:err.message})
