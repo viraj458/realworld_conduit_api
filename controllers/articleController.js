@@ -94,21 +94,14 @@ export const deleteArticle = async(req, res) => {
         const { slug } = req.params;
         const {id} = req.user
         
-        const [article] = await db('articles').where({slug})
+        const [article] = await db('articles').where({slug}).andWhere({author: id})
         
         if (!article) {
             return res.status(404).json({ error: "article not found" })
           }
-          console.log(article);
-        // const author = JSON.parse(article.author)
-        // const authorId = author.id
-
-        // if(!authorId===id){
-        //     return res.status(401).json({ error: 'You are not authorized to delete this article' })
-        // }
-        
-        // console.log(author);
-        await db('articles').where({ slug }).del()
+        //   console.log(article);
+   
+        await db('articles').where({slug}).andWhere({author: id}).del()
         
         res.status(200).json(article)
     } catch (err) {
