@@ -1,5 +1,5 @@
 import db from '../db.js'
-import slugify from 'slugify'
+import uniqueSlug from 'unique-slug'
 
 //create article
 export const createArticle = async(req, res) => {
@@ -12,7 +12,7 @@ export const createArticle = async(req, res) => {
         const {body,description,title,tagList} = req.body.article
         const tag_list = JSON.stringify(tagList)
 
-        const slug = slugify(title);
+        const slug = uniqueSlug(title);
         
         // console.log(tagList);
 
