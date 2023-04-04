@@ -142,3 +142,48 @@ export const getAllArticles = async(req, res) => {
     }
     
 }
+
+//update a article
+export const updateArticle = async(req, res) => {
+    try {
+        const {slug} = req.params
+        const {id} = req.user
+        // console.log(id);
+
+        const updateArticle = await db('articles').where({slug}).andWhere({author: id}).update({body: req.body.article.body})
+        if(!updateArticle){
+            res.status(401).json({error: 'article not found'})
+        }
+         
+        const [article] = await db('articles')
+        .where({slug})
+        .join('users', 'articles.author', 'users.id')
+        .select('articles.*', 'users.username', 'users.bio', 'users.image')
+
+        if (!article) {
+            return res.status(404).json({ error: "article not found" })
+          }
+          console.log(article);
+
+          res.status(200).json({article:{
+            slug: article.slug,
+            body: article.body,
+            description: article.description,
+            title: article.title,
+            tagList: JSON.parse(article.tagList),
+            createdAt: article.createdAt,
+            updatedAt: article.updatedAt,
+            author:{
+              username: article.username,
+              bio: article.bio,
+              image: article.image,
+              following: false
+            }
+        }})
+    } catch (err) {
+        res.status(400).json({error: err.message})
+    }
+
+
+
+}

@@ -1,5 +1,5 @@
 import express from 'express'
-import { createArticle, deleteArticle, getAllArticles, getArticle } from '../controllers/articleController.js'
+import { createArticle, deleteArticle, getAllArticles, getArticle, updateArticle } from '../controllers/articleController.js'
 import auth from '../middlewares/auth.js'
 
 
@@ -16,5 +16,8 @@ router.delete('/:slug', auth, deleteArticle)
 
 //get all articles
 router.get('/', getAllArticles)
+
+//update a article
+router.put('/:slug', auth, updateArticle)
 
 export default router

@@ -7,7 +7,6 @@ const router = express.Router()
 //add a comment
 router.post('/:slug/comments', auth,  createComment)
 
-
 //get all comments without auth
 router.get('/:slug/comments',  getAllComments)
 
