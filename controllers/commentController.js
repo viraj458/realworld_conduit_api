@@ -9,16 +9,28 @@ export const createComment = async(req, res) => {
 
         const {body} = req.body.comment
 
-        const comment = await db('comments').insert({
+        const [comment] = await db('comments').insert({
             body,
             article_slug: slug,
             user_id: id
         })
 
-        
+        const [insertedComment] = await db('comments').where('comments.id', comment)
+        .join('users', 'users.id', 'comments.user_id')
+        .select('users.username', 'users.bio', 'users.image', 'comments.*')
 
-        console.log(comment);
-        res.status(200).json({comment:comment})
+        // console.log(insertedComment);
+        res.status(200).json({comment:{
+            id: insertedComment.id,
+            createdAt: insertedComment.createdAt,
+            updatedAt: insertedComment.updatedAt,
+            body: insertedComment.body,
+            author: {
+                username: insertedComment.author,
+                bio: insertedComment.bio,
+                image: insertedComment.image
+            }
+        }})
     } catch (err) {
         res.status(400).json({error:err.message})
     }
