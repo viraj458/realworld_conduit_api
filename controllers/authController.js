@@ -47,7 +47,15 @@ const signup = async(email, password, username) =>{
 
         // create a token
         const token = createToken(user)
-        res.status(200).json({user:{email, token, username, }})
+
+        const insertedUser = await db('users').where({email}).select('*').first()
+        res.status(200).json({user:{
+          email, 
+          token, 
+          username, 
+          bio: insertedUser.bio, 
+          image: insertedUser.image
+        }})
     } catch (err) {
       res.status(400).json({error: err.message})
     }
