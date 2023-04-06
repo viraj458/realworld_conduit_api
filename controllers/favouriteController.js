@@ -1,6 +1,6 @@
 import db from '../db.js'
 
-
+//favourite controller
 export const favouriteArticle = async(req, res) => {
     try {
         const {id} = req.user
@@ -21,14 +21,15 @@ export const favouriteArticle = async(req, res) => {
         // console.log(favouriteArticlesInt);
 
         const index =favouriteArticlesInt.indexOf(article.id) 
-        if(index===-1){
-            favouriteArticles.push(article.id)
-
-            //update the favourite count on a specific article
-            await db('articles').where({slug}).increment('favouriteCount', 1)
-            // console.log(article);
+        if(index!==-1){
+            res.status(409).json('Already in favourites')
+            
         }
+        favouriteArticles.push(article.id)
 
+        //update the favourite count on a specific article
+        await db('articles').where({slug}).increment('favouriteCount', 1)
+        // console.log(article);
         await db('users').where({id}).update({favouriteArticles: favouriteArticles.join(',')})
         
       
@@ -64,6 +65,8 @@ export const favouriteArticle = async(req, res) => {
     
 }
 
+
+//unfavourite controller
 export const unFavouriteArticle = async(req, res) => {
 
     try {
@@ -79,12 +82,13 @@ export const unFavouriteArticle = async(req, res) => {
         const favouriteArticlesInt = favouriteArticles.map(elem=>parseInt(elem))
 
         const index = favouriteArticlesInt.indexOf(article.id)
-        if(index!==-1){
-            favouriteArticles.splice(index, 1)
-
-            await db('articles').where({slug}).decrement('favouriteCount', 1)
-            
+        if(index===-1){
+            res.status(401).json('Can not find article in favourites')
         }
+
+        favouriteArticles.splice(index, 1)
+
+        await db('articles').where({slug}).decrement('favouriteCount', 1)
 
         await db('users').where({id}).update({favouriteArticles: favouriteArticles.join(',')})
 
