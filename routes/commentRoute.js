@@ -9,7 +9,7 @@ const router = express.Router()
 router.post('/:slug/comments', auth,  createComment)
 
 //get all comments without auth
-router.get('/:slug/comments',authOptional, getAllComments)
+router.get('/:slug/comments', authOptional, getAllComments)
 
 //delete a comment 
 router.delete('/:slug/comments/:commentid', auth,  deleteComment)
