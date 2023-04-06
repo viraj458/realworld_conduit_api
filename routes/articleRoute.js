@@ -16,7 +16,7 @@ router.get('/:slug', auth, getArticle)
 router.delete('/:slug', auth, deleteArticle)
 
 //get all articles
-router.get('/',authOptional, getAllArticles)
+router.get('/', authOptional, getAllArticles)
 
 //update a article
 router.put('/:slug', auth, updateArticle)

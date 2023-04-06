@@ -28,7 +28,7 @@ export const createArticle = async(req, res) => {
         
 
         const [createdArticle] = await db('articles').where('id', article).select('*')
-        console.log(createdArticle);
+//        console.log(createdArticle);
 
         res.status(200).json({article:{
             slug,
@@ -38,6 +38,8 @@ export const createArticle = async(req, res) => {
             tagList: JSON.parse(tag_list),
             createdAt: createdArticle.createdAt,
             updatedAt: createdArticle.updatedAt,
+            favorited: createdArticle.favouriteCount? true: false,
+            favoritesCount: createdArticle.favouriteCount,
             author:{
                 username: user.username,
                 bio: user.bio,
@@ -65,7 +67,7 @@ export const getArticle = async(req, res) => {
         if (!article) {
             return res.status(404).json({ error: "article not found" })
           }
-          console.log(article);
+        //   console.log(article);
 
           res.status(200).json({article:{
             slug: article.slug,
@@ -75,6 +77,8 @@ export const getArticle = async(req, res) => {
             tagList: JSON.parse(article.tagList),
             createdAt: article.createdAt,
             updatedAt: article.updatedAt,
+            favorited: article.favouriteCount ? true : false,
+            favoritesCount: article.favouriteCount,
             author:{
               username: article.username,
               bio: article.bio,
@@ -127,6 +131,8 @@ export const getAllArticles = async(req, res) => {
               tagList: JSON.parse(article.tagList),
               createdAt: article.createdAt,
               updatedAt: article.updatedAt,
+              favorited: article.favouriteCount? true: false,
+              favoritesCount: article.favouriteCount,
               author:{
                 username: article.username,
                 bio: article.bio,
@@ -163,7 +169,7 @@ export const updateArticle = async(req, res) => {
         if (!article) {
             return res.status(404).json({ error: "article not found" })
           }
-          console.log(article);
+        //   console.log(article);
 
           res.status(200).json({article:{
             slug: article.slug,
@@ -173,6 +179,8 @@ export const updateArticle = async(req, res) => {
             tagList: JSON.parse(article.tagList),
             createdAt: article.createdAt,
             updatedAt: article.updatedAt,
+            favorited: article.favouriteCount? true: false,
+            favoritesCount: article.favouriteCount,
             author:{
               username: article.username,
               bio: article.bio,
