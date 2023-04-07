@@ -8,6 +8,7 @@ import articleRoute from './routes/articleRoute.js'
 import tagRoute from './routes/tagRoute.js'
 import commentRouter from './routes/commentRoute.js'
 import favouriteRoute from './routes/favouriteRoute.js'
+import profileRoute from './routes/profileRoute.js'
 
 dotenv.config()
 
@@ -38,3 +39,4 @@ app.use('/articles', articleRoute)
 app.use('/tags', tagRoute)
 app.use('/articles', commentRouter)
 app.use('/articles', favouriteRoute)
+app.use('/profiles', profileRoute)
