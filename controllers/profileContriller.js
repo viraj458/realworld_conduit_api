@@ -24,6 +24,34 @@ export const getProfile = async(req, res) => {
 }
 
 export const followProfile = async(req, res) => {
+    try {
+
+        const {id} = req.user
+        const {username} = req.params
+
+
+        const user = await db('users').where({username}).select('*').first()
+        const user_id = user.id
+        // console.log(user_id);
+
+        if(id===user_id){
+            res.status(401).json("denied")
+        }
+
+        await db('followers').insert({follower_user_id: id, following_user_id: user_id})
+
+        res.status(200).json({profile:{
+            username: user.username,
+            bio: user.bio,
+            image: user.image,
+            following: true
+        }})
+
+    } catch (err) {
+        res.status(400).json({error: err.message})
+    }
+    
+
 
 }
 

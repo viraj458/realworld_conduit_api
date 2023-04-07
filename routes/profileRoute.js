@@ -9,10 +9,10 @@ const router = express.Router()
 router.get('/:username', auth, getProfile)
 
 //follow profile
-router.post('/:username', auth, followProfile)
+router.post('/:username/follow', auth, followProfile)
 
 //unfollow profile
-router.delete('/:username', auth, unfollowProfile)
+router.delete('/:username/follow', auth, unfollowProfile)
 
 
 export default router
