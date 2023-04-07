@@ -200,13 +200,13 @@ export const updateArticle = async(req, res) => {
 //article feed controller
 export const feedArticle = async(req, res) => {
  try {
-    const feed = await db('articles')
+    const articles = await db('articles')
     .limit(20).orderBy('updatedAt')
     .join('users', 'articles.author', 'users.id')
     .select('articles.*', 'users.username', 'users.bio', 'users.image')
 
-    console.log(feed);
-    const feedList = (feed.map( article => {
+    // console.log(articles);
+    const articleFeed = (articles.map( article => {
             return {
               slug: article.slug,
               body: article.body,
@@ -227,7 +227,7 @@ export const feedArticle = async(req, res) => {
           }));
 
 
-    res.status(200).json({article: feedList})
+    res.status(200).json({articles: articleFeed, articlesCount: articleFeed.length})
  } catch (err) {
     res.status(400).json({error: err.message})
  }   
