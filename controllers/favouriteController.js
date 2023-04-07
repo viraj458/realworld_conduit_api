@@ -22,7 +22,7 @@ export const favouriteArticle = async(req, res) => {
 
         const index =favouriteArticlesInt.indexOf(article.id) 
         if(index!==-1){
-            res.status(409).json('Already in favourites')
+            return res.status(409).json('Already in favourites')
             
         }
         favouriteArticles.push(article.id)
@@ -83,7 +83,7 @@ export const unFavouriteArticle = async(req, res) => {
 
         const index = favouriteArticlesInt.indexOf(article.id)
         if(index===-1){
-            res.status(404).json('Can not find article in favourites')
+            return res.status(404).json('Can not find article in favourites')
         }
 
         favouriteArticles.splice(index, 1)
