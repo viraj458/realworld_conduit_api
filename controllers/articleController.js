@@ -195,3 +195,40 @@ export const updateArticle = async(req, res) => {
 
 
 }
+
+
+//article feed controller
+export const feedArticle = async(req, res) => {
+ try {
+    const feed = await db('articles')
+    .limit(20).orderBy('updatedAt')
+    .join('users', 'articles.author', 'users.id')
+    .select('articles.*', 'users.username', 'users.bio', 'users.image')
+
+    console.log(feed);
+    const feedList = (feed.map( article => {
+            return {
+              slug: article.slug,
+              body: article.body,
+              description: article.description,
+              title: article.title,
+              tagList: JSON.parse(article.tagList),
+              createdAt: article.createdAt,
+              updatedAt: article.updatedAt,
+              favorited: article.favouriteCount? true: false,
+              favoritesCount: article.favouriteCount,
+              author:{
+                username: article.username,
+                bio: article.bio,
+                image: article.image,
+                following: false
+            }
+            }
+          }));
+
+
+    res.status(200).json({article: feedList})
+ } catch (err) {
+    res.status(400).json({error: err.message})
+ }   
+}

@@ -83,7 +83,7 @@ export const unFavouriteArticle = async(req, res) => {
 
         const index = favouriteArticlesInt.indexOf(article.id)
         if(index===-1){
-            res.status(401).json('Can not find article in favourites')
+            res.status(404).json('Can not find article in favourites')
         }
 
         favouriteArticles.splice(index, 1)
@@ -99,23 +99,23 @@ export const unFavouriteArticle = async(req, res) => {
 
             
 
-            res.status(200).json({article:{
-                slug: articleInfo.slug,
-                body: articleInfo.body,
-                description: articleInfo.description,
-                title: articleInfo.title,
-                tagList: JSON.parse(articleInfo.tagList),
-                createdAt: articleInfo.createdAt,
-                updatedAt: articleInfo.updatedAt,
-                favorited: index!==-1 ? false : true,
-                favoritesCount: articleInfo.favouriteCount,
-                author:{
-                username: articleInfo.username,
-                bio: articleInfo.bio,
-                image: articleInfo.image,
-                following: false
-                }
-            }})
+        res.status(200).json({article:{
+            slug: articleInfo.slug,
+            body: articleInfo.body,
+            description: articleInfo.description,
+            title: articleInfo.title,
+            tagList: JSON.parse(articleInfo.tagList),
+            createdAt: articleInfo.createdAt,
+            updatedAt: articleInfo.updatedAt,
+            favorited: index!==-1 ? false : true,
+            favoritesCount: articleInfo.favouriteCount,
+            author:{
+              username: articleInfo.username,
+              bio: articleInfo.bio,
+              image: articleInfo.image,
+              following: false
+            }
+        }})
     } catch (err) {
         res.status(400).json({error: err.message})
     }
