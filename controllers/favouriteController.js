@@ -43,8 +43,10 @@ export const favouriteArticle = async(req, res) => {
             return res.status(404).json('article not found')
         }
 
-        await db('favorite').insert({user_id: id, article_id: article.id})
-
+        const favorite = await db('favorite').insert({user_id: id, article_id: article.id})
+        
+        await db('articles').where({slug}).increment('favouriteCount', 1)
+        
 
 
         const articleInfo = await db('favorite')
@@ -61,7 +63,7 @@ export const favouriteArticle = async(req, res) => {
             tagList: JSON.parse(articleInfo.tagList),
             createdAt: articleInfo.createdAt,
             updatedAt: articleInfo.updatedAt,
-            favorited: false,
+            favorited: favorite? true: false,
             favoritesCount: articleInfo.favouriteCount,
             author:{
               username: articleInfo.username,
@@ -84,32 +86,50 @@ export const unFavouriteArticle = async(req, res) => {
     try {
         const {id} = req.user
         const {slug} = req.params
+        console.log(slug);
+        // const article = await db('articles').where({slug}).select('id').first()
+
+        // const favourite = await db('users').where({id}).select('favouriteArticles').first()
+
+        // const favouriteArticles = favourite.favouriteArticles ? favourite.favouriteArticles.split(',') : [];
+
+        // const favouriteArticlesInt = favouriteArticles.map(elem=>parseInt(elem))
+
+        // const index = favouriteArticlesInt.indexOf(article.id)
+        // if(index===-1){
+        //     return res.status(404).json('Can not find article in favourites')
+        // }
+
+        // favouriteArticles.splice(index, 1)
+
+        // await db('articles').where({slug}).decrement('favouriteCount', 1)
+
+        // await db('users').where({id}).update({favouriteArticles: favouriteArticles.join(',')})
+
+        // const [articleInfo] = await db('articles')
+        //     .where({slug})
+        //     .join('users', 'articles.author', 'users.id')
+        //     .select('articles.*', 'users.username', 'users.bio', 'users.image')
 
         const article = await db('articles').where({slug}).select('id').first()
 
-        const favourite = await db('users').where({id}).select('favouriteArticles').first()
+        
 
-        const favouriteArticles = favourite.favouriteArticles ? favourite.favouriteArticles.split(',') : [];
-
-        const favouriteArticlesInt = favouriteArticles.map(elem=>parseInt(elem))
-
-        const index = favouriteArticlesInt.indexOf(article.id)
-        if(index===-1){
-            return res.status(404).json('Can not find article in favourites')
+        if(!article){
+            return res.status(404).json('no such article found')
         }
 
-        favouriteArticles.splice(index, 1)
+        const selectFavorite = await db('favorite').where({user_id: id, article_id: article.id}).first()
+        if(!selectFavorite){
+            return res.status(404).json('article not found in favorites')
+        }
 
+        const unfavorite = await db('favorite').where({user_id: id, article_id: article.id}).del()
         await db('articles').where({slug}).decrement('favouriteCount', 1)
-
-        await db('users').where({id}).update({favouriteArticles: favouriteArticles.join(',')})
-
-        const [articleInfo] = await db('articles')
-            .where({slug})
-            .join('users', 'articles.author', 'users.id')
-            .select('articles.*', 'users.username', 'users.bio', 'users.image')
-
-            
+        
+        const articleInfo = await db('articles')
+        .join('users', 'users.id', 'articles.author')
+        .select('articles.*', 'users.username', 'users.bio', 'users.image').first()
 
         res.status(200).json({article:{
             slug: articleInfo.slug,
@@ -119,7 +139,7 @@ export const unFavouriteArticle = async(req, res) => {
             tagList: JSON.parse(articleInfo.tagList),
             createdAt: articleInfo.createdAt,
             updatedAt: articleInfo.updatedAt,
-            favorited: index!==-1 ? false : true,
+            favorited: unfavorite ? false : true,
             favoritesCount: articleInfo.favouriteCount,
             author:{
               username: articleInfo.username,
