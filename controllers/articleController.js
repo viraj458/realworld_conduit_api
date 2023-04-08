@@ -113,9 +113,11 @@ export const deleteArticle = async(req, res) => {
     }
 }
 
-// get all articles
-export const getAllArticles = async(req, res) => {
+//List articles by tag, author, favorited, limit, offset and get all
+export const listArticles = async(req, res) => {
     try {
+
+        
 
         const articles = await db('articles')
         .join('users', 'articles.author', 'users.id')
@@ -233,4 +235,3 @@ export const feedArticle = async(req, res) => {
  }   
 }
 
-//

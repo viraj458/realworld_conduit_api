@@ -1,5 +1,5 @@
 import express from 'express'
-import { createArticle, deleteArticle, feedArticle, getAllArticles, getArticle, updateArticle } from '../controllers/articleController.js'
+import { createArticle, deleteArticle, feedArticle, getArticle, listArticles, updateArticle } from '../controllers/articleController.js'
 import auth from '../middlewares/auth.js'
 import authOptional from '../middlewares/authOptional.js'
 
@@ -12,17 +12,18 @@ router.post('/', auth, createArticle)
 //article feed, must define before '/:slug' route otherwise feed will consider as slug part
 router.get('/feed', auth, feedArticle)
 
-//create an article
+//get an article
 router.get('/:slug', auth, getArticle)
 
 //delete an article
 router.delete('/:slug', auth, deleteArticle)
 
-//get all articles
-router.get('/', authOptional, getAllArticles)
+//List articles by tag, author, favorited, limit, offset and get all
+router.get('/', authOptional, listArticles)
 
 //update a article
 router.put('/:slug', auth, updateArticle)
+
 
 
 

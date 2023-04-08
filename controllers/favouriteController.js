@@ -8,38 +8,50 @@ export const favouriteArticle = async(req, res) => {
 
         //add users favourite articles to favouriteArticles in users table. 
 
-        const article = await db('articles').where({slug}).select('id').first()
+        // const article = await db('articles').where({slug}).select('id').first()
         
 
-        const favourite = await db('users').where({id}).select('favouriteArticles').first()
-        // console.log(favourite.favouriteArticles);
+        // const favourite = await db('users').where({user_id: id}).select('favouriteArticles').first()
+        // // console.log(favourite.favouriteArticles);
 
-        const favouriteArticles = favourite.favouriteArticles ? favourite.favouriteArticles.split(',') : [];
-        // console.log(favouriteArticles);
+        // const favouriteArticles = favourite.favouriteArticles ? favourite.favouriteArticles.split(',') : [];
+        // // console.log(favouriteArticles);
 
-        const favouriteArticlesInt = favouriteArticles.map(elem=>parseInt(elem))
-        // console.log(favouriteArticlesInt);
+        // const favouriteArticlesInt = favouriteArticles.map(elem=>parseInt(elem))
+        // // console.log(favouriteArticlesInt);
 
-        const index =favouriteArticlesInt.indexOf(article.id) 
-        if(index!==-1){
-            return res.status(409).json('Already in favourites')
+        // const index =favouriteArticlesInt.indexOf(article.id) 
+        // if(index!==-1){
+        //     return res.status(409).json('Already in favourites')
             
+        // }
+        // favouriteArticles.push(article.id)
+
+        // //update the favourite count on a specific article
+        // await db('articles').where({slug}).increment('favouriteCount', 1)
+        // // console.log(article);
+        // await db('users').where({id}).update({favouriteArticles: favouriteArticles.join(',')})
+        
+        // const [articleInfo] = await db('articles')
+        // .where({slug})
+        // .join('users', 'articles.author', 'users.id')
+        // .select('articles.*', 'users.username', 'users.bio', 'users.image')
+
+        const article = await db('articles').where({slug}).select('id').first()
+
+        if(!article){
+            return res.status(404).json('article not found')
         }
-        favouriteArticles.push(article.id)
 
-        //update the favourite count on a specific article
-        await db('articles').where({slug}).increment('favouriteCount', 1)
-        // console.log(article);
-        await db('users').where({id}).update({favouriteArticles: favouriteArticles.join(',')})
-        
-      
-        
-        const [articleInfo] = await db('articles')
-        .where({slug})
-        .join('users', 'articles.author', 'users.id')
-        .select('articles.*', 'users.username', 'users.bio', 'users.image')
+        await db('favorite').insert({user_id: id, article_id: article.id})
 
-        
+
+
+        const articleInfo = await db('favorite')
+        .join('users', 'users.id', 'favorite.user_id')
+        .join('articles', 'articles.id', 'favorite.article_id')
+        .select('articles.*', 'users.username', 'users.bio', 'users.image').first()
+
 
         res.status(200).json({article:{
             slug: articleInfo.slug,
@@ -49,7 +61,7 @@ export const favouriteArticle = async(req, res) => {
             tagList: JSON.parse(articleInfo.tagList),
             createdAt: articleInfo.createdAt,
             updatedAt: articleInfo.updatedAt,
-            favorited: index===-1 ? true : false,
+            favorited: false,
             favoritesCount: articleInfo.favouriteCount,
             author:{
               username: articleInfo.username,
