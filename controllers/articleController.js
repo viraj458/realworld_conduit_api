@@ -12,8 +12,7 @@ export const createArticle = async(req, res) => {
         const {body,description,title,tagList} = req.body.article
         console.log(tagList[1]);
 
-        
-        const tag_list = JSON.stringify(tagList)
+    
         const slug = uniqueSlug(title);
         
 

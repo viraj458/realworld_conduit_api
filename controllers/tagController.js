@@ -2,18 +2,13 @@ import db from '../db.js'
 
 //get all tags
 export const getAllTags = async(req, res) => {
-    const tags = await db('articles').distinct('tagList').pluck('tagList')
-    const str = tags.toString(tags)
-    // console.log(str);
+    try {
+        const tags = await db('tags').distinct('tag')
+        const tagArr = tags.map(elem=> elem.tag)
+        res.status(200).json({tags:tagArr})
 
-    const tagsString = str.replace(/[\[\]"]/g, '');
-    // console.log(tagsString);
-
-    const seperatedTags = tagsString.split(',');
-    // console.log(seperatedTags);
-
-    const uniqueArr = [...new Set(seperatedTags)]
-
-    res.status(200).json({tags:uniqueArr})
+    } catch (err) {
+        res.status(400).json({error:err.message})
+    }
     
 }   
