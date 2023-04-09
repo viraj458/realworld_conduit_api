@@ -8,13 +8,9 @@ export const createArticle = async(req, res) => {
         const {id} = req.user
         const user = await db('users').where({id}).first()
 
-
         const {body,description,title,tagList} = req.body.article
-        console.log(tagList[1]);
-
     
         const slug = uniqueSlug(title);
-        
 
         const [article] = await db('articles').insert({
             slug,
@@ -24,8 +20,6 @@ export const createArticle = async(req, res) => {
             author: user.id
         })
 
-        
-
         const createdArticle = await db('articles').where('id', article).select('*').first()
     //    console.log(createdArticle);
 
@@ -33,7 +27,6 @@ export const createArticle = async(req, res) => {
         Promise.all(tagList.map(async tag => {
             await db('tags').insert({ article_id: createdArticle.id, tag: tag });
         }))
-
         
         
         const selectTags = await db('tags').where({article_id: createdArticle.id}).select('tag')
@@ -79,12 +72,15 @@ export const getArticle = async(req, res) => {
           }
         //   console.log(article);
 
+        const selectTags = await db('tags').where({article_id: article.id}).select('tag')
+        const tagArr = selectTags.map(elem => elem.tag)
+
           res.status(200).json({article:{
             slug: article.slug,
             body: article.body,
             description: article.description,
             title: article.title,
-            tagList: JSON.parse(article.tagList),
+            tagList: tagArr,
             createdAt: article.createdAt,
             updatedAt: article.updatedAt,
             favorited: article.favouriteCount ? true : false,
