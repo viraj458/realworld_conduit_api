@@ -180,15 +180,21 @@ export const listArticles = async(req, res) => {
 //update a article
 export const updateArticle = async(req, res) => {
     try {
+        const {tagList} = req.params
         const {slug} = req.params
         const {id} = req.user
         // console.log(id);
 
-        const updateArticle = await db('articles').where({slug}).andWhere({author: id}).update({body: req.body.article.body})
-        if(!updateArticle){
-            res.status(401).json({error: 'article not found'})
+        const findArticle = await db('articles').where({slug}).andWhere({author: id}).first()
+        if(!findArticle){
+            return res.status(401).json({error: 'article not found'})
         }
-         
+        await db('articles').where({slug}).andWhere({author: id}).update({body: req.body.article.body})
+        
+
+        const selectTags = await db('tags').where({article_id: findArticle.id}).select('tag')
+        const tagArr = selectTags.map(elem => elem.tag)
+
         const [article] = await db('articles')
         .where({slug})
         .join('users', 'articles.author', 'users.id')
@@ -204,7 +210,7 @@ export const updateArticle = async(req, res) => {
             body: article.body,
             description: article.description,
             title: article.title,
-            tagList: JSON.parse(article.tagList),
+            tagList: tagArr,
             createdAt: article.createdAt,
             updatedAt: article.updatedAt,
             favorited: article.favouriteCount? true: false,
