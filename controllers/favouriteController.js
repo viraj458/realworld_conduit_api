@@ -6,36 +6,6 @@ export const favouriteArticle = async(req, res) => {
         const {id} = req.user
         const {slug} = req.params
 
-        //add users favourite articles to favouriteArticles in users table. 
-
-        // const article = await db('articles').where({slug}).select('id').first()
-        
-
-        // const favourite = await db('users').where({user_id: id}).select('favouriteArticles').first()
-        // // console.log(favourite.favouriteArticles);
-
-        // const favouriteArticles = favourite.favouriteArticles ? favourite.favouriteArticles.split(',') : [];
-        // // console.log(favouriteArticles);
-
-        // const favouriteArticlesInt = favouriteArticles.map(elem=>parseInt(elem))
-        // // console.log(favouriteArticlesInt);
-
-        // const index =favouriteArticlesInt.indexOf(article.id) 
-        // if(index!==-1){
-        //     return res.status(409).json('Already in favourites')
-            
-        // }
-        // favouriteArticles.push(article.id)
-
-        // //update the favourite count on a specific article
-        // await db('articles').where({slug}).increment('favouriteCount', 1)
-        // // console.log(article);
-        // await db('users').where({id}).update({favouriteArticles: favouriteArticles.join(',')})
-        
-        // const [articleInfo] = await db('articles')
-        // .where({slug})
-        // .join('users', 'articles.author', 'users.id')
-        // .select('articles.*', 'users.username', 'users.bio', 'users.image')
 
         const article = await db('articles').where({slug}).select('id').first()
 
@@ -86,30 +56,6 @@ export const unFavouriteArticle = async(req, res) => {
     try {
         const {id} = req.user
         const {slug} = req.params
-        console.log(slug);
-        // const article = await db('articles').where({slug}).select('id').first()
-
-        // const favourite = await db('users').where({id}).select('favouriteArticles').first()
-
-        // const favouriteArticles = favourite.favouriteArticles ? favourite.favouriteArticles.split(',') : [];
-
-        // const favouriteArticlesInt = favouriteArticles.map(elem=>parseInt(elem))
-
-        // const index = favouriteArticlesInt.indexOf(article.id)
-        // if(index===-1){
-        //     return res.status(404).json('Can not find article in favourites')
-        // }
-
-        // favouriteArticles.splice(index, 1)
-
-        // await db('articles').where({slug}).decrement('favouriteCount', 1)
-
-        // await db('users').where({id}).update({favouriteArticles: favouriteArticles.join(',')})
-
-        // const [articleInfo] = await db('articles')
-        //     .where({slug})
-        //     .join('users', 'articles.author', 'users.id')
-        //     .select('articles.*', 'users.username', 'users.bio', 'users.image')
 
         const article = await db('articles').where({slug}).select('id').first()
 

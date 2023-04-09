@@ -10,32 +10,43 @@ export const createArticle = async(req, res) => {
 
 
         const {body,description,title,tagList} = req.body.article
-        const tag_list = JSON.stringify(tagList)
+        console.log(tagList[1]);
 
+        
+        const tag_list = JSON.stringify(tagList)
         const slug = uniqueSlug(title);
         
-        // console.log(tagList);
 
         const [article] = await db('articles').insert({
             slug,
             body,
             description,
             title,
-            tagList: tag_list,
             author: user.id
         })
 
         
 
-        const [createdArticle] = await db('articles').where('id', article).select('*')
-//        console.log(createdArticle);
+        const createdArticle = await db('articles').where('id', article).select('*').first()
+    //    console.log(createdArticle);
+
+
+        Promise.all(tagList.map(async tag => {
+            await db('tags').insert({ article_id: createdArticle.id, tag: tag });
+        }))
+
+        
+        
+        const selectTags = await db('tags').where({article_id: createdArticle.id}).select('tag')
+        const tagArr = selectTags.map(elem => elem.tag)
+        // console.log(tagArr)
 
         res.status(200).json({article:{
             slug,
             body,
             description,
             title,
-            tagList: JSON.parse(tag_list),
+            tagList: tagArr,
             createdAt: createdArticle.createdAt,
             updatedAt: createdArticle.updatedAt,
             favorited: createdArticle.favouriteCount? true: false,
