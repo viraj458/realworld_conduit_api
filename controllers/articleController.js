@@ -104,16 +104,36 @@ export const deleteArticle = async(req, res) => {
         const { slug } = req.params;
         const {id} = req.user
         
-        const [article] = await db('articles').where({slug}).andWhere({author: id})
-        
+        const article = await db('articles').where({slug}).andWhere({author: id}).first()
+
         if (!article) {
             return res.status(404).json({ error: "article not found" })
           }
-        //   console.log(article);
    
+        const selectTags = await db('tags').where({article_id: article.id}).select('tag')
+        const tagArr = selectTags.map(elem => elem.tag)
+
+        await db('tags').where({article_id: article.id}).del()
+
         await db('articles').where({slug}).andWhere({author: id}).del()
         
-        res.status(200).json(article)
+        res.status(200).json({article:{
+            slug: article.slug,
+            body: article.body,
+            description: article.description,
+            title: article.title,
+            tagList: tagArr,
+            createdAt: article.createdAt,
+            updatedAt: article.updatedAt,
+            favorited: article.favouriteCount ? true : false,
+            favoritesCount: article.favouriteCount,
+            author:{
+              username: article.username,
+              bio: article.bio,
+              image: article.image,
+              following: false
+            }
+        }})
     } catch (err) {
         res.status(400).json({error:err.message})
     }
