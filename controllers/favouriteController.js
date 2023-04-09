@@ -18,19 +18,20 @@ export const favouriteArticle = async(req, res) => {
         await db('articles').where({slug}).increment('favouriteCount', 1)
         
 
-
         const articleInfo = await db('favorite')
         .join('users', 'users.id', 'favorite.user_id')
         .join('articles', 'articles.id', 'favorite.article_id')
         .select('articles.*', 'users.username', 'users.bio', 'users.image').first()
 
+        const selectTags = await db('tags').where({article_id: article.id}).select('tag')
+        const tagArr = selectTags.map(elem => elem.tag)
 
         res.status(200).json({article:{
             slug: articleInfo.slug,
             body: articleInfo.body,
             description: articleInfo.description,
             title: articleInfo.title,
-            tagList: JSON.parse(articleInfo.tagList),
+            tagList: tagArr,
             createdAt: articleInfo.createdAt,
             updatedAt: articleInfo.updatedAt,
             favorited: favorite? true: false,
@@ -59,7 +60,6 @@ export const unFavouriteArticle = async(req, res) => {
 
         const article = await db('articles').where({slug}).select('id').first()
 
-        
 
         if(!article){
             return res.status(404).json('no such article found')
@@ -77,12 +77,15 @@ export const unFavouriteArticle = async(req, res) => {
         .join('users', 'users.id', 'articles.author')
         .select('articles.*', 'users.username', 'users.bio', 'users.image').first()
 
+        const selectTags = await db('tags').where({article_id: article.id}).select('tag')
+        const tagArr = selectTags.map(elem => elem.tag)
+
         res.status(200).json({article:{
             slug: articleInfo.slug,
             body: articleInfo.body,
             description: articleInfo.description,
             title: articleInfo.title,
-            tagList: JSON.parse(articleInfo.tagList),
+            tagList: tagArr,
             createdAt: articleInfo.createdAt,
             updatedAt: articleInfo.updatedAt,
             favorited: unfavorite ? false : true,
