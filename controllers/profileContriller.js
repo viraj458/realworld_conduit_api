@@ -35,7 +35,7 @@ export const followProfile = async(req, res) => {
         // console.log(user_id);
 
         if(id===user_id){
-            res.status(401).json("denied")
+            return res.status(401).json("denied")
         }
 
         await db('followers').insert({follower_user_id: id, following_user_id: user_id})

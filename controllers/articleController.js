@@ -145,6 +145,7 @@ export const listArticles = async(req, res) => {
 
         const { tag, author, favorited, limit = 20, offset = 0 } = req.query;
 
+        //filter by tag
         if(tag){
 
             const articles = await db('articles')
@@ -189,11 +190,11 @@ export const listArticles = async(req, res) => {
             })
         }
 
+        //filter by author
         if(author){
             const articles = await db('articles')
             .join('users', 'articles.author', 'users.id')
-            .join('tags', 'articles.id', 'tags.article_id')
-            .select('articles.*', 'users.username', 'users.bio', 'users.image', 'tags.tag')
+            .select('articles.*', 'users.username', 'users.bio', 'users.image')
             .where({username: author})
             .limit(limit)
             .offset(offset)
@@ -228,15 +229,16 @@ export const listArticles = async(req, res) => {
             })
         }
         
+        //filter by favorited
         if(favorited){
             
-            const x = await db('users').where({username: favorited}).select('id').first()
+            const user = await db('users').where({username: favorited}).select('id').first()
 
             const articles = await db('favorite')
             .join('users', 'users.id', 'favorite.user_id')
             .join('articles', 'articles.id', 'favorite.article_id')
             .select('articles.*', 'users.username', 'users.bio', 'users.image')
-            .where({user_id: x.id})
+            .where({user_id: user.id})
             .limit(limit)
             .offset(offset)
 
@@ -270,10 +272,10 @@ export const listArticles = async(req, res) => {
             })
         }
 
+        //filter by feed and offset
         const articles = await db('articles')
             .join('users', 'articles.author', 'users.id')
-            .join('tags', 'articles.id', 'tags.article_id')
-            .select('articles.*', 'users.username', 'users.bio', 'users.image', 'tags.tag')
+            .select('articles.*', 'users.username', 'users.bio', 'users.image')
             .limit(limit)
             .offset(offset)
 
@@ -315,7 +317,6 @@ export const listArticles = async(req, res) => {
 //update a article
 export const updateArticle = async(req, res) => {
     try {
-        const {tagList} = req.params
         const {slug} = req.params
         const {id} = req.user
         // console.log(id);
