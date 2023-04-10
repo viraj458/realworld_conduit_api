@@ -21,7 +21,7 @@ export const favouriteArticle = async(req, res) => {
         const articleInfo = await db('favorite')
         .join('users', 'users.id', 'favorite.user_id')
         .join('articles', 'articles.id', 'favorite.article_id')
-        .select('articles.*', 'users.username', 'users.bio', 'users.image').first()
+        .select('articles.*', 'users.username', 'users.bio', 'users.image').where({slug}).first()
 
         const selectTags = await db('tags').where({article_id: article.id}).select('tag')
         const tagArr = selectTags.map(elem => elem.tag)
@@ -75,7 +75,7 @@ export const unFavouriteArticle = async(req, res) => {
         
         const articleInfo = await db('articles')
         .join('users', 'users.id', 'articles.author')
-        .select('articles.*', 'users.username', 'users.bio', 'users.image').first()
+        .select('articles.*', 'users.username', 'users.bio', 'users.image').where({slug}).first()
 
         const selectTags = await db('tags').where({article_id: article.id}).select('tag')
         const tagArr = selectTags.map(elem => elem.tag)
