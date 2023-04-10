@@ -228,31 +228,84 @@ export const listArticles = async(req, res) => {
             })
         }
         
+        if(favorited){
+            
+            const x = await db('users').where({username: favorited}).select('id').first()
 
-        // const selectTags = await db('tags').where({article_id: article.id}).select('tag')
-        // const tagArr = selectTags.map(elem => elem.tag)
+            const articles = await db('favorite')
+            .join('users', 'users.id', 'favorite.user_id')
+            .join('articles', 'articles.id', 'favorite.article_id')
+            .select('articles.*', 'users.username', 'users.bio', 'users.image')
+            .where({user_id: x.id})
+            .limit(limit)
+            .offset(offset)
 
-        // const articleList = (articles.map( article => {
-        //     return {
-        //       slug: article.slug,
-        //       body: article.body,
-        //       description: article.description,
-        //       title: article.title,
-        //       tagList: tagArr,
-        //       createdAt: article.createdAt,
-        //       updatedAt: article.updatedAt,
-        //       favorited: article.favouriteCount? true: false,
-        //       favoritesCount: article.favouriteCount,
-        //       author:{
-        //         username: article.username,
-        //         bio: article.bio,
-        //         image: article.image,
-        //         following: false
-        //     }
-        //     }
-        //   }));
 
-        // res.status(200).json({articles:articleList, articlesCount:articleList.length})
+            const articleArr = await Promise.all(articles.map(async elem=>{
+
+                const selectTags = await db('tags').where({article_id: elem.id}).select('tag')
+                const tagArr = selectTags.map(e => e.tag)
+
+                return {
+                    slug: elem.slug,
+                    title: elem.title,
+                    description: elem.description,
+                    body: elem.body,
+                    tagList: tagArr,
+                    createdAt: elem.createdAt,
+                    updatedAt: elem.updatedAt,
+                    favorited: elem.favoritesCount ? true : false,
+                    favoritesCount: elem.favouriteCount,
+                    author:{
+                        username: elem.username,
+                        bio: elem.bio,
+                        image: elem.image,
+                    }
+                }
+
+            }))
+            return res.status(200).json({
+                articles: articleArr,
+                articlesCount: articles.length
+            })
+        }
+
+        const articles = await db('articles')
+            .join('users', 'articles.author', 'users.id')
+            .join('tags', 'articles.id', 'tags.article_id')
+            .select('articles.*', 'users.username', 'users.bio', 'users.image', 'tags.tag')
+            .limit(limit)
+            .offset(offset)
+
+            console.log(articles);
+            const articleArr = await Promise.all(articles.map(async elem=>{
+
+                const selectTags = await db('tags').where({article_id: elem.id}).select('tag')
+                const tagArr = selectTags.map(e => e.tag)
+
+                return {
+                    slug: elem.slug,
+                    title: elem.title,
+                    description: elem.description,
+                    body: elem.body,
+                    tagList: tagArr,
+                    createdAt: elem.createdAt,
+                    updatedAt: elem.updatedAt,
+                    favorited: elem.favoritesCount ? true : false,
+                    favoritesCount: elem.favouriteCount,
+                    author:{
+                        username: elem.username,
+                        bio: elem.bio,
+                        image: elem.image,
+                    }
+                }
+
+            }))
+            res.status(200).json({
+                articles: articleArr,
+                articlesCount: articles.length
+            })
+        
     } catch (err) {
         res.status(400).json({error:err.message})
     }
