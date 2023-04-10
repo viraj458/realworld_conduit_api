@@ -183,7 +183,7 @@ export const listArticles = async(req, res) => {
                 }
 
             }))
-            res.status(200).json({
+            return res.status(200).json({
                 articles: articleArr,
                 articlesCount: articles.length
             })
@@ -222,7 +222,7 @@ export const listArticles = async(req, res) => {
                 }
 
             }))
-            res.status(200).json({
+            return res.status(200).json({
                 articles: articleArr,
                 articlesCount: articles.length
             })
@@ -301,7 +301,7 @@ export const listArticles = async(req, res) => {
                 }
 
             }))
-            res.status(200).json({
+            return res.status(200).json({
                 articles: articleArr,
                 articlesCount: articles.length
             })
@@ -370,33 +370,40 @@ export const updateArticle = async(req, res) => {
 export const feedArticle = async(req, res) => {
  try {
     const articles = await db('articles')
-    .limit(20).orderBy('updatedAt')
     .join('users', 'articles.author', 'users.id')
     .select('articles.*', 'users.username', 'users.bio', 'users.image')
+    .limit(20)
+    .orderBy('createdAt', 'desc')
 
-    // console.log(articles);
-    const articleFeed = (articles.map( article => {
-            return {
-              slug: article.slug,
-              body: article.body,
-              description: article.description,
-              title: article.title,
-              tagList: JSON.parse(article.tagList),
-              createdAt: article.createdAt,
-              updatedAt: article.updatedAt,
-              favorited: article.favouriteCount? true: false,
-              favoritesCount: article.favouriteCount,
-              author:{
-                username: article.username,
-                bio: article.bio,
-                image: article.image,
-                following: false
+    console.log(articles);
+    const articleArr = await Promise.all(articles.map(async elem=>{
+
+        const selectTags = await db('tags').where({article_id: elem.id}).select('tag')
+        const tagArr = selectTags.map(e => e.tag)
+
+        return {
+            slug: elem.slug,
+            title: elem.title,
+            description: elem.description,
+            body: elem.body,
+            tagList: tagArr,
+            createdAt: elem.createdAt,
+            updatedAt: elem.updatedAt,
+            favorited: elem.favoritesCount ? true : false,
+            favoritesCount: elem.favouriteCount,
+            author:{
+                username: elem.username,
+                bio: elem.bio,
+                image: elem.image,
             }
-            }
-          }));
+        }
 
-
-    res.status(200).json({articles: articleFeed, articlesCount: articleFeed.length})
+    }))
+    return res.status(200).json({
+        articles: articleArr,
+        articlesCount: articles.length
+    })
+        
  } catch (err) {
     res.status(400).json({error: err.message})
  }   
