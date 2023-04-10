@@ -143,34 +143,79 @@ export const deleteArticle = async(req, res) => {
 export const listArticles = async(req, res) => {
     try {
 
+        const { tag, author, favorited, limit = 20, offset = 0 } = req.query;
+
+        if(tag){
+
+            const articles = await db('articles')
+            .join('users', 'articles.author', 'users.id')
+            .join('tags', 'articles.id', 'tags.article_id')
+            .select('articles.*', 'users.username', 'users.bio', 'users.image', 'tags.tag')
+            .where({tag: tag})
+            .limit(limit)
+            .offset(offset)
         
 
-        const articles = await db('articles')
-        .join('users', 'articles.author', 'users.id')
-        .select('articles.*', 'users.username', 'users.bio', 'users.image')
+            // console.log(articles);
+
+            const articleArr = await Promise.all(articles.map(async elem=>{
+
+                const selectTags = await db('tags').where({article_id: elem.id}).select('tag')
+                const tagArr = selectTags.map(e => e.tag)
+
+                
+
+                return {
+                    slug: elem.slug,
+                    title: elem.title,
+                    description: elem.description,
+                    body: elem.body,
+                    tagList: tagArr,
+                    createdAt: elem.createdAt,
+                    updatedAt: elem.updatedAt,
+                    favorited: elem.favoritesCount ? true : false,
+                    favoritesCount: elem.favouriteCount,
+                    author:{
+                        username: elem.username,
+                        bio: elem.bio,
+                        image: elem.image,
+                    }
+                }
+
+            }))
+            res.status(200).json({
+                articles: articleArr,
+                articlesCount: articles.length
+            })
+        }
+
+        
         
 
-        const articleList = (articles.map( article => {
-            return {
-              slug: article.slug,
-              body: article.body,
-              description: article.description,
-              title: article.title,
-              tagList: JSON.parse(article.tagList),
-              createdAt: article.createdAt,
-              updatedAt: article.updatedAt,
-              favorited: article.favouriteCount? true: false,
-              favoritesCount: article.favouriteCount,
-              author:{
-                username: article.username,
-                bio: article.bio,
-                image: article.image,
-                following: false
-            }
-            }
-          }));
+        // const selectTags = await db('tags').where({article_id: article.id}).select('tag')
+        // const tagArr = selectTags.map(elem => elem.tag)
 
-        res.status(200).json({articles:articleList, articlesCount:articleList.length})
+        // const articleList = (articles.map( article => {
+        //     return {
+        //       slug: article.slug,
+        //       body: article.body,
+        //       description: article.description,
+        //       title: article.title,
+        //       tagList: tagArr,
+        //       createdAt: article.createdAt,
+        //       updatedAt: article.updatedAt,
+        //       favorited: article.favouriteCount? true: false,
+        //       favoritesCount: article.favouriteCount,
+        //       author:{
+        //         username: article.username,
+        //         bio: article.bio,
+        //         image: article.image,
+        //         following: false
+        //     }
+        //     }
+        //   }));
+
+        // res.status(200).json({articles:articleList, articlesCount:articleList.length})
     } catch (err) {
         res.status(400).json({error:err.message})
     }
