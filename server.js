@@ -1,14 +1,14 @@
 import express from 'express'
 import dotenv from 'dotenv'
-import db from './db.js'
+import db from './src/db.js'
 
-import authRoute from './routes/authRoute.js'
-import userRoute from './routes/userRoute.js'
-import articleRoute from './routes/articleRoute.js'
-import tagRoute from './routes/tagRoute.js'
-import commentRouter from './routes/commentRoute.js'
-import favouriteRoute from './routes/favouriteRoute.js'
-import profileRoute from './routes/profileRoute.js'
+import authRoute from './src/routes/authRoute.js'
+import userRoute from './src/routes/userRoute.js'
+import articleRoute from './src/routes/articleRoute.js'
+import tagRoute from './src/routes/tagRoute.js'
+import commentRouter from './src/routes/commentRoute.js'
+import favouriteRoute from './src/routes/favouriteRoute.js'
+import profileRoute from './src/routes/profileRoute.js'
 
 dotenv.config()
 
